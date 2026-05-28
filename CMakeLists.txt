@@ -5,7 +5,9 @@ set(CMAKE_CXX_STANDARD 20)
 
 add_executable(ultimate_texture_packer src/Main.cpp
         src/ui/ImageScrollList.cpp
-        src/ui/ImageScrollList.hpp)
+        src/ui/ImageScrollList.hpp
+        src/utils/FileUtil.cpp
+        src/utils/FileUtil.hpp)
 
 add_subdirectory(external/raylib)
 target_link_libraries(${PROJECT_NAME} raylib)

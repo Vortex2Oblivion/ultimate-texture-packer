@@ -8,14 +8,19 @@ namespace utp::ui {
 	class ImageScrollList {
 	public:
 		ImageScrollList(float x, float y, float width, float height);
+		ImageScrollList(Rectangle bounds);
 
 		~ImageScrollList();
 
 		float x, y, width, height = 0.0f;
+		float steps = 20.0f;
 
-		void draw() const;
+		Texture currentTexture = {};
+		std::vector<Texture> textures = {};
+
+		void draw();
 
 	protected:
-		std::vector<Texture> textures = {};
+		float scrollY = 0.0f;
 	};
 }

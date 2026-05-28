@@ -1,5 +1,6 @@
 #include "ImageScrollList.hpp"
 
+#include <iostream>
 #include "raymath.h"
 
 namespace utp::ui {
@@ -10,30 +11,57 @@ namespace utp::ui {
 		this->height = height;
 	}
 
+	ImageScrollList::ImageScrollList(const Rectangle bounds) : ImageScrollList(bounds.x, bounds.y, bounds.width, bounds.height) {}
+
 	ImageScrollList::~ImageScrollList() {
 		for (const auto texture: textures) {
-			UnloadTexture(texture);
 		}
 	};
 
-	void ImageScrollList::draw() const {
-		BeginScissorMode(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
-		for (const auto texture: this->textures) {
-			DrawTexturePro(
-				texture,
-				Rectangle{
-					.x = 0.0f, .y = 0.0f, .width = static_cast<float>(texture.width),
-					.height = static_cast<float>(texture.height)
-				},
-				Rectangle{
-					.x = x, .y = y, .width = static_cast<float>(texture.width),
-					.height = static_cast<float>(texture.height)
-				},
-				Vector2Zero(),
-				0.0f,
-				WHITE
-			);
+	void ImageScrollList::draw() {
+		constexpr float thickness = 1.0f;
+		const auto backgroundRect = Rectangle{.x = x, .y = y, .width = width, .height = height};
+
+		if (CheckCollisionPointRec(GetMousePosition(), backgroundRect)) {
+			scrollY -= GetMouseWheelMove() * height / steps;
 		}
+
+
+		BeginScissorMode(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
+
+		DrawRectangleRec(backgroundRect, DARKGRAY);
+		float drawY = scrollY;
+		for (size_t i = 0; i < textures.size(); i++) {
+			const auto texture = textures[i];
+
+			const float scale = width / std::fmaxf(static_cast<float>(texture.height), static_cast<float>(texture.width));
+
+
+			const auto scaledWidth = static_cast<float>(texture.width) * scale;
+			const auto scaledHeight = static_cast<float>(texture.height) * scale;
+
+			const auto hitbox = Rectangle{.x = x, .y = y + drawY, .width = width, .height = scaledHeight};
+
+			DrawRectangleRec(hitbox, i % 2 == 0 ? LIGHTGRAY : GRAY);
+
+			DrawTexturePro(texture,
+						   Rectangle{.x = 0.0f,
+									 .y = 0.0f,
+									 .width = static_cast<float>(texture.width),
+									 .height = static_cast<float>(texture.height)},
+						   Rectangle{.x = x, .y = y + drawY, .width = scaledWidth, .height = scaledHeight}, Vector2Zero(), 0.0f,
+						   WHITE);
+
+			if (CheckCollisionPointRec(GetMousePosition(), hitbox)) {
+				DrawRectangleRec(hitbox, ColorAlpha(WHITE, sin(static_cast<float>(GetTime()) * 2.0f) / 3.0f + 1.0f / 3.0f));
+				if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+					currentTexture = texture;
+				}
+			}
+
+			drawY += scaledHeight;
+		}
+		DrawRectangleLinesEx(backgroundRect, thickness, BLACK);
 		EndScissorMode();
 	}
-}
+} // namespace utp::ui
