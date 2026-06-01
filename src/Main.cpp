@@ -22,17 +22,6 @@ int main() {
 		BeginDrawing();
 		ClearBackground(WHITE);
 		scroll.draw();
-		DrawTexturePro(scroll.currentTexture,
-					   Rectangle{.x = 0.0f,
-								 .y = 0.0f,
-								 .width = static_cast<float>(scroll.currentTexture.width),
-								 .height = static_cast<float>(scroll.currentTexture.height)},
-					   Rectangle{.x = scroll.x,
-								 .y = 0.0f,
-								 .width = scroll.width,
-								 .height = static_cast<float>(scroll.currentTexture.height) * scroll.width /
-										   static_cast<float>(scroll.currentTexture.width)},
-					   Vector2Zero(), 0.0f, WHITE);
 		if (IsKeyDown(KEY_SPACE)) {
 			auto [outPath, result] = utp::utils::FileUtil::openFileDialog({{"Image file", "png"}});
 			if (result == NFD_OKAY) {
@@ -44,6 +33,7 @@ int main() {
 				TraceLog(LOG_ERROR, NFD_GetError());
 			}
 		}
+		DrawFPS(0, 0);
 		EndDrawing();
 	}
 

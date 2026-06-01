@@ -26,10 +26,10 @@ namespace utp::ui {
 			scrollY -= GetMouseWheelMove() * height / steps;
 		}
 
+		DrawRectangleRec(Rectangle{.x = x, .y = 0.0f, .width = width, .height = static_cast<float>(GetRenderHeight())}, DARKGRAY);
 
 		BeginScissorMode(static_cast<int>(x), static_cast<int>(y), static_cast<int>(width), static_cast<int>(height));
 
-		DrawRectangleRec(backgroundRect, DARKGRAY);
 		float drawY = scrollY;
 		for (size_t i = 0; i < textures.size(); i++) {
 			const auto texture = textures[i];
@@ -61,7 +61,23 @@ namespace utp::ui {
 
 			drawY += scaledHeight;
 		}
-		DrawRectangleLinesEx(backgroundRect, thickness, BLACK);
 		EndScissorMode();
+		DrawTexturePro(currentTexture,
+					   Rectangle{.x = 0.0f,
+								 .y = 0.0f,
+								 .width = static_cast<float>(currentTexture.width),
+								 .height = static_cast<float>(currentTexture.height)},
+					   Rectangle{.x = x,
+								 .y = 0.0f,
+								 .width = width,
+								 .height = static_cast<float>(currentTexture.height) * width /
+										   static_cast<float>(currentTexture.width)},
+					   Vector2Zero(), 0.0f, WHITE);
+		DrawRectangleLinesEx(backgroundRect, thickness, BLACK);
+		DrawRectangleLinesEx(Rectangle{.x = backgroundRect.x,
+									   .y = 0.0f,
+									   .width = backgroundRect.width,
+									   .height = static_cast<float>(GetRenderHeight())},
+							 thickness, BLACK);
 	}
 } // namespace utp::ui
