@@ -2,7 +2,6 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
-#include "raymath.h"
 #include "ui/ImageScrollList.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
 #include "utils/FileUtil.hpp"
@@ -25,8 +24,13 @@ int main() {
 	auto loadFilesButton = utp::ui::Button(10, 10, 48, 48, "", "Load Files", BLACK);
 	loadFilesButton.icon = ICON_FILE_ADD;
 
-	loadFilesButton.onPress.append([&loadMenu] {
+	loadFilesButton.onPress.append([&loadMenu, &loadFilesButton] {
 		loadMenu.open = true;
+		loadFilesButton.disabled = true;
+	});
+
+	loadMenu.onClose.append([&loadFilesButton] {
+		loadFilesButton.disabled = false;
 	});
 
 	while (!WindowShouldClose()) {

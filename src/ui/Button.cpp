@@ -24,6 +24,9 @@ namespace utp::ui {
 
 
 	void Button::draw() {
+		if (disabled) {
+			GuiDisable();
+		}
 		const auto hitbox = Rectangle{.x = x, .y = y, .width = width, .height = height};
 		pressed = GuiButton(hitbox, text.c_str());
 		if (pressed) {
@@ -41,5 +44,6 @@ namespace utp::ui {
 		else {
 			GuiDisableTooltip();
 		}
+		GuiEnable();
 	}
 } // namespace utp::ui

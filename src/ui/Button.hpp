@@ -22,6 +22,7 @@ namespace utp::ui {
 		int icon = -1;
 
 		bool pressed = false;
+		bool disabled = false;
 
 		eventpp::CallbackList<void()> onPress;
 

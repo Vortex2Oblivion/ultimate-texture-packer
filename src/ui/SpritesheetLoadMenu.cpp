@@ -85,13 +85,27 @@ namespace utp::ui {
 			return;
 		}
 
+		if (disabled) {
+			GuiDisable();
+		}
+
 		const auto position = Rectangle{.x = x, .y = y, .width = this->width, .height = this->height};
 
 		open = !GuiWindowBox(position, "Select files");
+		if (!open) {
+			onClose();
+			return;
+		}
 
 		constexpr float statusbarHeight = 24.0f;
+		const auto clipRect = Rectangle{.x = x + padding,
+										.y = y + statusbarHeight + loadSpritesheet.height + padding * 2,
+										.width = this->width - padding * 2,
+										.height = this->height - statusbarHeight - loadSpritesheet.height - padding * 3};
 
-		if (IsTextureValid(selectedSpritesheetPreview)) {
+		const bool canDrag = IsTextureValid(selectedSpritesheetPreview);
+
+		if (canDrag) {
 
 			const float wheel = GetMouseWheelMove();
 
@@ -105,25 +119,11 @@ namespace utp::ui {
 				camPreview.offset = GetMousePosition();
 				camPreview.target = mouseWorldPos;
 
-				const float scale = 0.2f * wheel;
+				const float scale = 0.1f * wheel;
 
 				camPreview.zoom = Clamp(expf(logf(camPreview.zoom) + scale), minZoom, maxZoom);
 			}
 
-			const auto clipRect = Rectangle{.x = x + padding,
-											.y = y + statusbarHeight + loadSpritesheet.height + padding * 2,
-											.width = this->width - padding * 2,
-											.height = this->height - statusbarHeight - loadSpritesheet.height - padding * 3};
-
-			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (CheckCollisionPointRec(GetMousePosition(), clipRect) || dragging)) {
-				camPreview.target -= GetMouseDelta() / camPreview.zoom;
-				GuiDisable();
-				dragging = true;
-			}
-			else {
-				GuiEnable();
-				dragging = false;
-			}
 
 			BeginScissorMode(static_cast<int>(clipRect.x), static_cast<int>(clipRect.y), static_cast<int>(clipRect.width),
 							 static_cast<int>(clipRect.height));
@@ -154,5 +154,13 @@ namespace utp::ui {
 		repack.x = loadXML.x + loadXML.width + padding;
 		repack.y = loadXML.y;
 		repack.draw();
+
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (CheckCollisionPointRec(GetMousePosition(), clipRect) || disabled) && canDrag) {
+			camPreview.target -= GetMouseDelta() / camPreview.zoom;
+			disabled = loadSpritesheet.disabled = loadXML.disabled = repack.disabled = true;
+		} else {
+			disabled = loadSpritesheet.disabled = loadXML.disabled = repack.disabled = false;
+		}
+		GuiEnable();
 	}
 } // namespace utp::ui

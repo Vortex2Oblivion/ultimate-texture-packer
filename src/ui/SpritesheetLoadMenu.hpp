@@ -1,10 +1,10 @@
 #pragma once
 
-#include <memory>
 #include <vector>
 
 #include "Button.hpp"
 #include "data/Frame.hpp"
+#include "eventpp/callbacklist.h"
 
 namespace utp::ui {
 	class SpritesheetLoadMenu {
@@ -13,15 +13,19 @@ namespace utp::ui {
 		~SpritesheetLoadMenu();
 
 		bool open = false;
+		bool disabled = false;
 
 		float x;
 		float y;
 		float width;
 		float height;
 
+		eventpp::CallbackList<void()> onClose;
+
 		Button loadSpritesheet;
 		Button loadXML;
 		Button repack;
+
 
 		static float padding;
 
@@ -29,8 +33,6 @@ namespace utp::ui {
 		void screenCenter();
 
 	protected:
-		bool dragging = false;
-
 		Texture selectedSpritesheetPreview{};
 		Image spritesheetImage{};
 
