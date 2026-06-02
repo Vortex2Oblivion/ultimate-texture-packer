@@ -46,8 +46,8 @@ namespace utp::ui {
 				doc.load_file(outPath.c_str());
 
 				for (auto frame: doc.child("TextureAtlas").children("SubTexture")) {
-					rectsToDraw.push_back(Rectangle{.x = frame.attribute("x").as_float() + static_cast<float>(x),
-													.y = frame.attribute("y").as_float() + static_cast<float>(y),
+					rectsToDraw.push_back(Rectangle{.x = frame.attribute("x").as_float() + static_cast<float>(x) + this->x,
+													.y = frame.attribute("y").as_float() + static_cast<float>(y) + this->y,
 													.width = frame.attribute("width").as_float(),
 													.height = frame.attribute("height").as_float()});
 					frames.push_back(data::Frame{.x = frame.attribute("x").as_float(),
@@ -84,29 +84,62 @@ namespace utp::ui {
 		if (!open) {
 			return;
 		}
+
 		const auto position = Rectangle{.x = x, .y = y, .width = this->width, .height = this->height};
+
 		open = !GuiWindowBox(position, "Select files");
 
 		constexpr float statusbarHeight = 24.0f;
+
 		if (IsTextureValid(selectedSpritesheetPreview)) {
-			camPreview.zoom = Clamp(camPreview.zoom + GetMouseWheelMove() / 10.0f, 0.1f, 3.0f);
+
+			const float wheel = GetMouseWheelMove();
+
+			// stolen from raylib demo lmao
+			// https://www.raylib.com/examples/core/loader.html?name=core_2d_camera_mouse_zoom
+			if (wheel != 0.0f) {
+				constexpr float maxZoom = 3.0f;
+				constexpr float minZoom = 0.1f;
+
+				const Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camPreview);
+				camPreview.offset = GetMousePosition();
+				camPreview.target = mouseWorldPos;
+
+				const float scale = 0.2f * wheel;
+
+				camPreview.zoom = Clamp(expf(logf(camPreview.zoom) + scale), minZoom, maxZoom);
+			}
+
 			const auto clipRect = Rectangle{.x = x + padding,
 											.y = y + statusbarHeight + loadSpritesheet.height + padding * 2,
 											.width = this->width - padding * 2,
 											.height = this->height - statusbarHeight - loadSpritesheet.height - padding * 3};
-			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), clipRect)) {
+
+			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (CheckCollisionPointRec(GetMousePosition(), clipRect) || dragging)) {
 				camPreview.target -= GetMouseDelta() / camPreview.zoom;
+				GuiDisable();
+				dragging = true;
+			}
+			else {
+				GuiEnable();
+				dragging = false;
 			}
 
 			BeginScissorMode(static_cast<int>(clipRect.x), static_cast<int>(clipRect.y), static_cast<int>(clipRect.width),
 							 static_cast<int>(clipRect.height));
+
 			BeginMode2D(camPreview);
+
 			DrawTexture(selectedSpritesheetPreview, static_cast<int>(x), static_cast<int>(y), WHITE);
+
 			for (const auto rect: rectsToDraw) {
 				DrawRectanglePro(rect, Vector2Zero(), 0.0f, ColorAlpha(BLUE, 0.1));
 			}
+
 			EndMode2D();
+
 			DrawRectangleLinesEx(clipRect, static_cast<float>(GuiGetStyle(STATUSBAR, BORDER_WIDTH)), BLACK);
+
 			EndScissorMode();
 		}
 

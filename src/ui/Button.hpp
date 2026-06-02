@@ -24,5 +24,8 @@ namespace utp::ui {
 		bool pressed = false;
 
 		eventpp::CallbackList<void()> onPress;
+
+	private:
+		static bool drawTooltip;
 	};
 } // namespace utp::ui
