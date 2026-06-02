@@ -16,21 +16,27 @@ int main() {
 
 	SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
 
-	auto scroll = utp::ui::ImageScrollList(
-			Rectangle{.x = screenWidth - 200.0f, .y = 150.0f, .width = 200.0, .height = screenHeight - 150.0f});
+
+	auto scroll = utp::ui::ImageScrollList(screenWidth - 200.0f, 150.0f, 200.0, screenHeight - 150.0f);
 
 	auto loadMenu = utp::ui::SpritesheetLoadMenu(0.0f, 0.0f, 650.0f, 450.0f);
 	loadMenu.screenCenter();
 
+	auto loadFilesButton = utp::ui::Button(10, 10, 48, 48, "", "Load Files", BLACK);
+	loadFilesButton.icon = ICON_FILE_ADD;
+
+	loadFilesButton.onPress.append([&loadMenu] {
+		loadMenu.open = true;
+	});
+
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(WHITE);
-		if (IsKeyDown(KEY_SPACE)) {
-			loadMenu.open = true;
-		}
+
+		loadFilesButton.draw();
+
 		scroll.draw();
 		loadMenu.draw();
-		DrawFPS(0, 0);
 		EndDrawing();
 	}
 

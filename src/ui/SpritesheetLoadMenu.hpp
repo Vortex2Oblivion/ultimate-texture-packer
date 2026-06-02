@@ -29,8 +29,10 @@ namespace utp::ui {
 		void screenCenter();
 
 	protected:
-		Image spritesheetImage{};
+		bool dragging = false;
+
 		Texture selectedSpritesheetPreview{};
+		Image spritesheetImage{};
 
 		std::vector<Rectangle> rectsToDraw = {};
 		std::vector<data::Frame> frames = {};

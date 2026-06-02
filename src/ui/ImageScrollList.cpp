@@ -56,6 +56,7 @@ namespace utp::ui {
 				DrawRectangleRec(hitbox, ColorAlpha(WHITE, sin(static_cast<float>(GetTime()) * 2.0f) / 3.0f + 1.0f / 3.0f));
 				if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 					currentTexture = texture;
+					clickTimerRunning = true;
 				}
 			}
 
@@ -79,5 +80,22 @@ namespace utp::ui {
 									   .width = backgroundRect.width,
 									   .height = static_cast<float>(GetRenderHeight())},
 							 thickness, BLACK);
+
+		const auto resetClickTimer = [this] {
+			clickTimer = 0.0f;
+			clickTimerRunning = false;
+		};
+
+		constexpr float timeToSelect = 0.33f;
+		if (clickTimerRunning) {
+			clickTimer += GetFrameTime();
+			if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+				onSelect();
+				resetClickTimer();
+			}
+		}
+		if (clickTimer >= timeToSelect) {
+			resetClickTimer();
+		}
 	}
 } // namespace utp::ui
