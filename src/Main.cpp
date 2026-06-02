@@ -4,6 +4,7 @@
 #include "raygui.h"
 #include "raymath.h"
 #include "ui/ImageScrollList.hpp"
+#include "ui/SpritesheetLoadMenu.hpp"
 #include "utils/FileUtil.hpp"
 
 int main() {
@@ -18,21 +19,17 @@ int main() {
 	auto scroll = utp::ui::ImageScrollList(
 			Rectangle{.x = screenWidth - 200.0f, .y = 150.0f, .width = 200.0, .height = screenHeight - 150.0f});
 
+	auto loadMenu = utp::ui::SpritesheetLoadMenu(0.0f, 0.0f, 650.0f, 450.0f);
+	loadMenu.screenCenter();
+
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(WHITE);
-		scroll.draw();
 		if (IsKeyDown(KEY_SPACE)) {
-			auto [outPath, result] = utp::utils::FileUtil::openFileDialog({{"Image file", "png"}});
-			if (result == NFD_OKAY) {
-				auto texture = LoadTexture(outPath.c_str());
-				GenTextureMipmaps(&texture);
-				SetTextureFilter(texture, TEXTURE_FILTER_TRILINEAR);
-				scroll.textures.push_back(texture);
-			} else {
-				TraceLog(LOG_ERROR, NFD_GetError());
-			}
+			loadMenu.open = true;
 		}
+		scroll.draw();
+		loadMenu.draw();
 		DrawFPS(0, 0);
 		EndDrawing();
 	}

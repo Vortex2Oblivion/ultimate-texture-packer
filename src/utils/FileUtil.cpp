@@ -4,7 +4,6 @@
 namespace utp::utils {
 
 	FileResult FileUtil::openFileDialog(const std::vector<nfdu8filteritem_t> &filterList, const std::string &defaultPath) {
-
 		const nfdopendialogu8args_t args = {
 				.filterList = filterList.data(),
 				.filterCount = static_cast<nfdfiltersize_t>(filterList.size()),
