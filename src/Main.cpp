@@ -5,12 +5,14 @@
 #include "ui/ImageScrollList.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
 #include "utils/FileUtil.hpp"
+#include "utils/Repacker.hpp"
 
 int main() {
 	constexpr int screenWidth = 1280;
 	constexpr int screenHeight = 720;
 
 	InitWindow(screenWidth, screenHeight, "Ultimate Texture Packer");
+
 	NFD_Init();
 
 	SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
@@ -31,6 +33,21 @@ int main() {
 
 	loadMenu.onClose.append([&loadFilesButton] {
 		loadFilesButton.disabled = false;
+	});
+
+	loadMenu.repack.onPress.append([&scroll, &loadMenu, &loadFilesButton] {
+		Image dst;
+		const Image src = LoadImageFromTexture(loadMenu.selectedSpritesheetPreview);
+
+		utp::utils::Repacker::repack(dst, src, 8192, 8192, loadMenu.frames, false);
+
+		scroll.textures.push_back( LoadTextureFromImage(dst));
+
+		UnloadImage(dst);
+		UnloadImage(src);
+
+		loadMenu.open = false;
+		loadMenu.onClose();
 	});
 
 	while (!WindowShouldClose()) {

@@ -9,7 +9,9 @@ add_executable(ultimate_texture_packer src/Main.cpp
         src/utils/FileUtil.cpp
         src/utils/FileUtil.hpp
         src/ui/SpritesheetLoadMenu.cpp
-        src/ui/Button.cpp)
+        src/ui/Button.cpp
+        src/utils/Repacker.cpp
+        src/utils/Repacker.hpp)
 
 include_directories(src/)
 

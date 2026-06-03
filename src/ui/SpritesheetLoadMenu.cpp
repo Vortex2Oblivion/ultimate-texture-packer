@@ -9,6 +9,7 @@
 #include "utils/FileUtil.hpp"
 
 namespace utp::ui {
+
 	float SpritesheetLoadMenu::padding = 5;
 
 	SpritesheetLoadMenu::SpritesheetLoadMenu(const float x, const float y, const float width, const float height) {
@@ -66,7 +67,7 @@ namespace utp::ui {
 			}
 		});
 
-		const auto pos = Vector2{.x = static_cast<float>(x), .y = static_cast<float>(y)};
+		const auto pos = Vector2{.x = x, .y = y};
 
 		this->camPreview = Camera2D{.offset = pos, .target = pos, .rotation = 0.0, .zoom = 1.0};
 	}
@@ -84,6 +85,8 @@ namespace utp::ui {
 		if (!open) {
 			return;
 		}
+
+		DrawRectangle(0, 0, GetRenderWidth(), GetRenderHeight(), ColorAlpha(BLACK, 0.5f));
 
 		if (disabled) {
 			GuiDisable();
@@ -138,10 +141,10 @@ namespace utp::ui {
 
 			EndMode2D();
 
-			DrawRectangleLinesEx(clipRect, static_cast<float>(GuiGetStyle(STATUSBAR, BORDER_WIDTH)), BLACK);
 
 			EndScissorMode();
 		}
+		DrawRectangleLinesEx(clipRect, static_cast<float>(GuiGetStyle(STATUSBAR, BORDER_WIDTH)), BLACK);
 
 		loadSpritesheet.x = x + padding * 3.0f + (this->width - x * 2.0f) / 3.0f;
 		loadSpritesheet.y = position.y + statusbarHeight + padding;

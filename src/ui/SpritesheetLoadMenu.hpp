@@ -20,6 +20,10 @@ namespace utp::ui {
 		float width;
 		float height;
 
+		Texture selectedSpritesheetPreview{};
+
+		std::vector<data::Frame> frames = {};
+
 		eventpp::CallbackList<void()> onClose;
 
 		Button loadSpritesheet;
@@ -33,11 +37,9 @@ namespace utp::ui {
 		void screenCenter();
 
 	protected:
-		Texture selectedSpritesheetPreview{};
 		Image spritesheetImage{};
 
 		std::vector<Rectangle> rectsToDraw = {};
-		std::vector<data::Frame> frames = {};
 
 		Camera2D camPreview{};
 	};
