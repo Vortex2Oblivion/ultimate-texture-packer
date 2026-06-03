@@ -35,7 +35,7 @@ int main() {
 		loadFilesButton.disabled = false;
 	});
 
-	loadMenu.repack.onPress.append([&scroll, &loadMenu, &loadFilesButton] {
+	loadMenu.repack.onPress.append([&scroll, &loadMenu] {
 		Image dst;
 		const Image src = LoadImageFromTexture(loadMenu.selectedSpritesheetPreview);
 

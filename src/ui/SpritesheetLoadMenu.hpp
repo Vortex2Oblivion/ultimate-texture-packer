@@ -37,8 +37,6 @@ namespace utp::ui {
 		void screenCenter();
 
 	protected:
-		Image spritesheetImage{};
-
 		std::vector<Rectangle> rectsToDraw = {};
 
 		Camera2D camPreview{};

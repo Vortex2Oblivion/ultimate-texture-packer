@@ -70,6 +70,13 @@ namespace utp::ui {
 		const auto pos = Vector2{.x = x, .y = y};
 
 		this->camPreview = Camera2D{.offset = pos, .target = pos, .rotation = 0.0, .zoom = 1.0};
+
+		onClose.append([this] {
+			UnloadTexture(selectedSpritesheetPreview);
+			selectedSpritesheetPreview = {};
+			frames.clear();
+			rectsToDraw.clear();
+		});
 	}
 
 	SpritesheetLoadMenu::~SpritesheetLoadMenu() = default;
