@@ -1,8 +1,8 @@
 #include "Button.hpp"
 
 #include "raygui.h"
-namespace utp::ui {
 
+namespace utp::ui {
 	bool Button::drawTooltip = false;
 
 	Button::Button(const float x, const float y, const float width, const float height, const std::string &text,
@@ -21,7 +21,6 @@ namespace utp::ui {
 	}
 
 	Button::~Button() = default;
-
 
 	void Button::draw() {
 		if (disabled) {
