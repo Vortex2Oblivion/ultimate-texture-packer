@@ -3,20 +3,19 @@
 #include "nfd.h"
 
 #include <filesystem>
-#include <string>
 #include <vector>
 
 
 namespace utp::utils {
 
 	struct FileResult {
-		std::string outPath;
+		std::filesystem::path outPath;
 		nfdresult_t result;
 	};
 
 	class FileUtil {
 	public:
-		static FileResult openFileDialog(const std::vector<nfdu8filteritem_t> &filterList,
-										 const std::string &defaultPath = std::filesystem::current_path());
+		static std::filesystem::path lastPath;
+		static FileResult openFileDialog(const std::vector<nfdu8filteritem_t> &filterList, const std::filesystem::path& defaultPath = lastPath);
 	};
 } // namespace utp::utils
