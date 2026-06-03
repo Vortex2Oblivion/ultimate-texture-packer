@@ -1,5 +1,7 @@
 #include "FileUtil.hpp"
 
+#include <iostream>
+
 namespace utp::utils {
 
 	std::filesystem::path FileUtil::lastPath = std::filesystem::current_path();
