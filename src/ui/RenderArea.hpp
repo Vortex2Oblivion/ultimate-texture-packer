@@ -20,5 +20,6 @@ namespace utp::ui {
 
 	protected:
 		Camera2D cam{};
+		bool dragging = false;
 	};
 } // namespace utp::ui

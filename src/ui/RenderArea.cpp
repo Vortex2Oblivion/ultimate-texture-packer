@@ -24,9 +24,10 @@ namespace utp::ui {
 
 		const auto area = Rectangle{.x = x, .y = y, .width = width, .height = height};
 
-		if (CheckCollisionPointRec(GetMousePosition(), area)) {
+		if (CheckCollisionPointRec(GetMousePosition(), area) || dragging) {
 			const float wheel = GetMouseWheelMove();
 			if (wheel != 0.0f) {
+
 				constexpr float maxZoom = 3.0f;
 				constexpr float minZoom = 0.1f;
 
@@ -38,8 +39,12 @@ namespace utp::ui {
 
 				cam.zoom = Clamp(expf(logf(cam.zoom) + scale), minZoom, maxZoom);
 			}
-			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && CheckCollisionPointRec(GetMousePosition(), area)) {
+			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (CheckCollisionPointRec(GetMousePosition(), area) || dragging)) {
 				cam.target -= GetMouseDelta() / cam.zoom;
+				dragging = true;
+			}
+			else {
+				dragging = false;
 			}
 		}
 

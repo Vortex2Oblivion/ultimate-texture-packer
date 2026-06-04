@@ -28,42 +28,44 @@ namespace utp::ui {
 		loadSpritesheet.onPress.append([this] {
 			auto [outPath, result] = utils::FileUtil::openFileDialog({{"Image file", "png"}});
 
-			if (result == NFD_OKAY) {
-				loadSpritesheet.tooltip = outPath;
-				UnloadTexture(selectedSpritesheetPreview);
-				selectedSpritesheetPreview = LoadTexture(outPath.c_str());
-			} else {
+			if (result == NFD_ERROR) {
 				TraceLog(LOG_ERROR, NFD_GetError());
+				return;
 			}
+			loadSpritesheet.tooltip = outPath;
+			UnloadTexture(selectedSpritesheetPreview);
+			selectedSpritesheetPreview = LoadTexture(outPath.c_str());
 		});
 
 		loadXML.onPress.append([this, x, y] {
 			auto [outPath, result] = utils::FileUtil::openFileDialog({{"XML file", "xml"}});
 
-			if (result == NFD_OKAY) {
-				loadXML.tooltip = outPath;
-				rectsToDraw.clear();
-				pugi::xml_document doc;
-				doc.load_file(outPath.c_str());
-
-				for (auto frame: doc.child("TextureAtlas").children("SubTexture")) {
-					rectsToDraw.push_back(Rectangle{.x = frame.attribute("x").as_float() + static_cast<float>(x) + this->x,
-													.y = frame.attribute("y").as_float() + static_cast<float>(y) + this->y,
-													.width = frame.attribute("width").as_float(),
-													.height = frame.attribute("height").as_float()});
-					frames.push_back(data::Frame{.x = frame.attribute("x").as_float(),
-												 .y = frame.attribute("y").as_float(),
-												 .width = frame.attribute("width").as_float(),
-												 .height = frame.attribute("height").as_float(),
-												 .frameX = frame.attribute("frameX").as_float(),
-												 .frameY = frame.attribute("frameY").as_float(),
-												 .frameWidth = frame.attribute("frameWidth").as_float(),
-												 .frameHeight = frame.attribute("frameHeight").as_float(),
-												 .rotated = frame.attribute("rotated").as_bool(),
-												 .name = frame.attribute("name").as_string()});
-				}
-			} else {
+			if (result == NFD_ERROR) {
 				TraceLog(LOG_ERROR, NFD_GetError());
+				return;
+			}
+
+			loadXML.tooltip = outPath;
+			rectsToDraw.clear();
+			pugi::xml_document doc;
+			doc.load_file(outPath.c_str());
+
+			for (auto frame: doc.child("TextureAtlas").children("SubTexture")) {
+				rectsToDraw.push_back(Rectangle{.x = frame.attribute("x").as_float() + static_cast<float>(x) + this->x,
+												.y = frame.attribute("y").as_float() + static_cast<float>(y) + this->y,
+												.width = frame.attribute("width").as_float(),
+												.height = frame.attribute("height").as_float()});
+
+				frames.push_back(data::Frame{.x = frame.attribute("x").as_float(),
+											 .y = frame.attribute("y").as_float(),
+											 .width = frame.attribute("width").as_float(),
+											 .height = frame.attribute("height").as_float(),
+											 .frameX = frame.attribute("frameX").as_float(),
+											 .frameY = frame.attribute("frameY").as_float(),
+											 .frameWidth = frame.attribute("frameWidth").as_float(),
+											 .frameHeight = frame.attribute("frameHeight").as_float(),
+											 .rotated = frame.attribute("rotated").as_bool(),
+											 .name = frame.attribute("name").as_string()});
 			}
 		});
 
