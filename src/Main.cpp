@@ -2,12 +2,15 @@
 
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
-#include "raymath.h"
 #include "ui/ImageScrollList.hpp"
 #include "ui/RenderArea.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
 #include "utils/FileUtil.hpp"
 #include "utils/Repacker.hpp"
+
+#if !defined(NDEBUG) || defined(_DEBUG)
+#define DEBUG
+#endif
 
 int main() {
 	constexpr int screenWidth = 1280;
@@ -64,9 +67,7 @@ int main() {
 
 	Texture bigPreview{};
 
-	scroll.onSelect.append([&scroll, &bigPreview] {
-		bigPreview = scroll.currentTexture;
-	});
+	scroll.onSelect.append([&scroll, &bigPreview] { bigPreview = scroll.currentTexture; });
 
 
 	outputPreview.onDraw.append([&bigPreview] {
@@ -80,11 +81,15 @@ int main() {
 		BeginDrawing();
 		ClearBackground(WHITE);
 
+
 		outputPreview.draw();
 		loadFilesButton.draw();
 		scroll.draw();
 		loadMenu.draw();
 
+#ifdef DEBUG
+		DrawFPS(0, 0);
+#endif
 		EndDrawing();
 	}
 
