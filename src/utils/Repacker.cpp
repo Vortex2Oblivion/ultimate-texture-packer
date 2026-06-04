@@ -5,6 +5,7 @@
 namespace utp::utils {
 	void Repacker::repack(Image &dst, const Image &src, const int width, const int height, const std::vector<data::Frame> &frames,
 						  const bool allowRotate, const bool crop) {
+
 		dst = GenImageColor(width, height, BLANK);
 		auto packer = rbp::MaxRectsBinPack(width, height, allowRotate);
 

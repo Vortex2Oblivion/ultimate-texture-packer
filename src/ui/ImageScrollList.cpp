@@ -19,6 +19,7 @@ namespace utp::ui {
 	};
 
 	void ImageScrollList::draw() {
+		framePassed = true;
 		constexpr float thickness = 1.0f;
 		const auto backgroundRect = Rectangle{.x = x, .y = y, .width = width, .height = height};
 
@@ -56,13 +57,28 @@ namespace utp::ui {
 				DrawRectangleRec(hitbox, ColorAlpha(WHITE, sin(static_cast<float>(GetTime()) * 2.0f) / 3.0f + 1.0f / 3.0f));
 				if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
 					currentTexture = texture;
-					clickTimerRunning = true;
+					if (!clickTimerRunning) {
+						clickTimerRunning = true;
+						framePassed = false;
+					}
 				}
 			}
 
 			drawY += scaledHeight;
 		}
 		EndScissorMode();
+
+
+		const bool heightBigger = currentTexture.height > currentTexture.width;
+
+		float scale;
+
+		if (heightBigger) {
+			scale = (static_cast<float>(GetRenderHeight()) - height) / static_cast<float>(currentTexture.height);
+		} else {
+			scale = (static_cast<float>(GetRenderHeight()) - width) / static_cast<float>(currentTexture.width);
+		}
+
 		DrawTexturePro(currentTexture,
 					   Rectangle{.x = 0.0f,
 								 .y = 0.0f,
@@ -70,9 +86,8 @@ namespace utp::ui {
 								 .height = static_cast<float>(currentTexture.height)},
 					   Rectangle{.x = x,
 								 .y = 0.0f,
-								 .width = width,
-								 .height = static_cast<float>(currentTexture.height) * width /
-										   static_cast<float>(currentTexture.width)},
+								 .width = static_cast<float>(currentTexture.width) * scale,
+								 .height = static_cast<float>(currentTexture.height) * scale},
 					   Vector2Zero(), 0.0f, WHITE);
 		DrawRectangleLinesEx(backgroundRect, thickness, BLACK);
 		DrawRectangleLinesEx(Rectangle{.x = backgroundRect.x,
@@ -89,11 +104,12 @@ namespace utp::ui {
 		constexpr float timeToSelect = 0.33f;
 		if (clickTimerRunning) {
 			clickTimer += GetFrameTime();
-			if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+			if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && framePassed) {
 				onSelect();
 				resetClickTimer();
 			}
 		}
+
 		if (clickTimer >= timeToSelect) {
 			resetClickTimer();
 		}

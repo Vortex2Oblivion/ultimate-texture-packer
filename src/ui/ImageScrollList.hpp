@@ -27,5 +27,6 @@ namespace utp::ui {
 		float scrollY = 0.0f;
 		float clickTimer = 0.0f;
 		bool clickTimerRunning = false;
+		bool framePassed = false;
 	};
 }
