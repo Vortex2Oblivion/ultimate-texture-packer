@@ -49,7 +49,7 @@ int main() {
 		Image dst;
 		const Image src = LoadImageFromTexture(loadMenu.selectedSpritesheetPreview);
 
-		utp::utils::Repacker::repack(dst, src, 8192, 8192, loadMenu.frames, false);
+		utp::utils::Repacker::repack(dst, src, 8192, 8192, loadMenu.frames, true);
 
 		Texture t = LoadTextureFromImage(dst);
 #ifdef false

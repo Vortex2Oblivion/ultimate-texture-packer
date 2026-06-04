@@ -1,5 +1,9 @@
 #include "Repacker.hpp"
 
+#include <cmath>
+#include <iostream>
+#include <ostream>
+
 #include "MaxRectsBinPack.h"
 
 namespace utp::utils {
@@ -17,6 +21,12 @@ namespace utp::utils {
 		for (const auto &frame: frames) {
 			Rectangle packedRect{};
 			rbp::Rect _rect{};
+
+			bool wasRotated;
+
+			Rectangle srcRect{};
+			Image imageCropped{};
+
 			for (const auto &packed: packedFrames) {
 				if (frame == packed) {
 					goto end;
@@ -25,21 +35,40 @@ namespace utp::utils {
 			_rect = packer.Insert(static_cast<int>(frame.width), static_cast<int>(frame.height),
 								  rbp::MaxRectsBinPack::RectBottomLeftRule);
 
+			wasRotated = static_cast<float>(_rect.width) == frame.height && static_cast<float>(_rect.height) == frame.width;
+
 			packedRect = Rectangle{.x = static_cast<float>(_rect.x),
 								   .y = static_cast<float>(_rect.y),
 								   .width = static_cast<float>(_rect.width),
 								   .height = static_cast<float>(_rect.height)};
 
+			srcRect = Rectangle{.x = frame.x, .y = frame.y, .width = frame.width, .height = frame.height};
+
+			imageCropped = ImageCopy(src);
+
+			ImageCrop(&imageCropped, srcRect);
+
+			if (wasRotated) {
+				ImageRotateCW(&imageCropped);
+			}
+
 			if (packedRect.width != 0 && packedRect.height != 0) {
 
-				ImageDraw(&dst, src, Rectangle{.x = frame.x, .y = frame.y, .width = frame.width, .height = frame.height},
-						  {.x = packedRect.x, .y = packedRect.y, .width = packedRect.width, .height = packedRect.height}, WHITE);
+				ImageDraw(&dst, imageCropped,
+						  Rectangle{.x = 0.0f,
+									.y = 0.0f,
+									.width = static_cast<float>(imageCropped.width),
+									.height = static_cast<float>(imageCropped.height)},
+						  Rectangle{.x = packedRect.x, .y = packedRect.y, .width = packedRect.width, .height = packedRect.height}, WHITE);
 
 				packedFrames.push_back(frame);
 				croppedWidth = std::max(croppedWidth, packedRect.x + packedRect.width);
 				croppedHeight = std::max(croppedHeight, packedRect.y + packedRect.height);
 			}
+
+			UnloadImage(imageCropped);
 			packedFrames.push_back(frame);
+
 		end:;
 		}
 
