@@ -67,7 +67,10 @@ int main() {
 
 	Texture bigPreview{};
 
-	scroll.onSelect.append([&scroll, &bigPreview] { bigPreview = scroll.currentTexture; });
+	scroll.onSelect.append([&scroll, &bigPreview, &outputPreview] {
+		bigPreview = scroll.currentTexture;
+		outputPreview.resetCamPos();
+	});
 
 
 	outputPreview.onDraw.append([&bigPreview] {

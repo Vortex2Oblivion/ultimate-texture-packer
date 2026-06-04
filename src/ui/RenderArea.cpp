@@ -63,4 +63,11 @@ namespace utp::ui {
 
 		DrawRectangleLinesEx(area, static_cast<float>(GuiGetStyle(STATUSBAR, BORDER_WIDTH)), BLACK);
 	}
+
+	void RenderArea::resetCamPos() {
+		cam.offset = Vector2Zero();
+		cam.target = Vector2Zero();
+		cam.zoom = 1.0f;
+		cam.rotation = 0.0f;
+	}
 } // namespace utp::ui

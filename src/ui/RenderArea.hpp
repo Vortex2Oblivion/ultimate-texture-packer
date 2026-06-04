@@ -22,6 +22,7 @@ namespace utp::ui {
 
 
 		void draw();
+		void resetCamPos();
 
 	protected:
 		Camera2D cam{};
