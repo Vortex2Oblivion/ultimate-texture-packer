@@ -24,7 +24,7 @@ namespace utp::ui {
 
 		const auto area = Rectangle{.x = x, .y = y, .width = width, .height = height};
 
-		if (CheckCollisionPointRec(GetMousePosition(), area) || dragging) {
+		if (canDrag && (CheckCollisionPointRec(GetMousePosition(), area) || dragging)) {
 			const float wheel = GetMouseWheelMove();
 			if (wheel != 0.0f) {
 

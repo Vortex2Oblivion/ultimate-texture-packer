@@ -6,8 +6,10 @@
 namespace utp::ui {
 	class RenderArea {
 	public:
-		RenderArea(float x, float y, float width, float height);
+		explicit RenderArea(float x = 0.0f, float y = 0.0f, float width = 0.0f, float height = 0.0f);
 		~RenderArea();
+
+		bool canDrag = true;
 
 		float x = 0.0f;
 		float y = 0.0f;
@@ -15,6 +17,9 @@ namespace utp::ui {
 		float height = 0.0f;
 
 		eventpp::CallbackList<void()> onDraw;
+		eventpp::CallbackList<void()> onMouseDown;
+		eventpp::CallbackList<void()> onMouseUp;
+
 
 		void draw();
 

@@ -21,9 +21,11 @@ namespace utp::ui {
 		const auto buttonWidth = width / 3 - padding * 3;
 		constexpr auto buttonHeight = 48.0f;
 
-		this->loadSpritesheet = Button(10, 10, buttonWidth, buttonHeight, "Load Spritesheet", "", BLACK);
-		this->loadXML = Button(10, 10, buttonWidth, buttonHeight, "Load XML", "", BLACK);
-		this->repack = Button(10, 10, buttonWidth, buttonHeight, "Repack", "Repack the spritesheet.", BLACK);
+		loadSpritesheet = Button(10, 10, buttonWidth, buttonHeight, "Load Spritesheet", "", BLACK);
+		loadXML = Button(10, 10, buttonWidth, buttonHeight, "Load XML", "", BLACK);
+		repack = Button(10, 10, buttonWidth, buttonHeight, "Repack", "Repack the spritesheet.", BLACK);
+
+		renderArea = RenderArea();
 
 		loadSpritesheet.onPress.append([this] {
 			auto [outPath, result] = utils::FileUtil::openFileDialog({{"Image file", "png"}});
@@ -51,8 +53,8 @@ namespace utp::ui {
 			doc.load_file(outPath.c_str());
 
 			for (auto frame: doc.child("TextureAtlas").children("SubTexture")) {
-				rectsToDraw.push_back(Rectangle{.x = frame.attribute("x").as_float() + static_cast<float>(x) + this->x,
-												.y = frame.attribute("y").as_float() + static_cast<float>(y) + this->y,
+				rectsToDraw.push_back(Rectangle{.x = frame.attribute("x").as_float() + static_cast<float>(x),
+												.y = frame.attribute("y").as_float() + static_cast<float>(y),
 												.width = frame.attribute("width").as_float(),
 												.height = frame.attribute("height").as_float()});
 
@@ -69,15 +71,19 @@ namespace utp::ui {
 			}
 		});
 
-		const auto pos = Vector2{.x = x, .y = y};
-
-		this->camPreview = Camera2D{.offset = pos, .target = pos, .rotation = 0.0, .zoom = 1.0};
-
 		onClose.append([this] {
 			UnloadTexture(selectedSpritesheetPreview);
 			selectedSpritesheetPreview = {};
 			frames.clear();
 			rectsToDraw.clear();
+		});
+
+		renderArea.onDraw.append([this, x, y] {
+			DrawTexture(selectedSpritesheetPreview, static_cast<int>(x), static_cast<int>(y), WHITE);
+
+			for (const auto rect: rectsToDraw) {
+				DrawRectanglePro(rect, Vector2Zero(), 0.0f, ColorAlpha(BLUE, 0.1));
+			}
 		});
 	}
 
@@ -86,8 +92,6 @@ namespace utp::ui {
 	void SpritesheetLoadMenu::screenCenter() {
 		x = (static_cast<float>(GetRenderWidth()) - width) / 2.0f;
 		y = (static_cast<float>(GetRenderHeight()) - height) / 2.0f;
-		camPreview.offset = camPreview.target =
-				Vector2{.x = static_cast<float>(GetRenderWidth()) / 2.0f, .y = static_cast<float>(GetRenderHeight()) / 2.0f};
 	}
 
 	void SpritesheetLoadMenu::draw() {
@@ -110,50 +114,15 @@ namespace utp::ui {
 		}
 
 		constexpr float statusbarHeight = 24.0f;
-		const auto clipRect = Rectangle{.x = x + padding,
-										.y = y + statusbarHeight + loadSpritesheet.height + padding * 2,
-										.width = this->width - padding * 2,
-										.height = this->height - statusbarHeight - loadSpritesheet.height - padding * 3};
-
-		const bool canDrag = IsTextureValid(selectedSpritesheetPreview);
-
-		if (canDrag) {
-
-			const float wheel = GetMouseWheelMove();
-
-			// stolen from raylib demo lmao
-			// https://www.raylib.com/examples/core/loader.html?name=core_2d_camera_mouse_zoom
-			if (wheel != 0.0f) {
-				constexpr float maxZoom = 3.0f;
-				constexpr float minZoom = 0.1f;
-
-				const Vector2 mouseWorldPos = GetScreenToWorld2D(GetMousePosition(), camPreview);
-				camPreview.offset = GetMousePosition();
-				camPreview.target = mouseWorldPos;
-
-				const float scale = 0.1f * wheel;
-
-				camPreview.zoom = Clamp(expf(logf(camPreview.zoom) + scale), minZoom, maxZoom);
-			}
 
 
-			BeginScissorMode(static_cast<int>(clipRect.x), static_cast<int>(clipRect.y), static_cast<int>(clipRect.width),
-							 static_cast<int>(clipRect.height));
+		renderArea.x = x + padding;
+		renderArea.y = y + statusbarHeight + loadSpritesheet.height + padding * 2;
+		renderArea.width = this->width - padding * 2;
+		renderArea.height = this->height - statusbarHeight - loadSpritesheet.height - padding * 3;
 
-			BeginMode2D(camPreview);
+		renderArea.draw();
 
-			DrawTexture(selectedSpritesheetPreview, static_cast<int>(x), static_cast<int>(y), WHITE);
-
-			for (const auto rect: rectsToDraw) {
-				DrawRectanglePro(rect, Vector2Zero(), 0.0f, ColorAlpha(BLUE, 0.1));
-			}
-
-			EndMode2D();
-
-
-			EndScissorMode();
-		}
-		DrawRectangleLinesEx(clipRect, static_cast<float>(GuiGetStyle(STATUSBAR, BORDER_WIDTH)), BLACK);
 
 		loadSpritesheet.x = x + padding * 3.0f + (this->width - x * 2.0f) / 3.0f;
 		loadSpritesheet.y = position.y + statusbarHeight + padding;
@@ -166,13 +135,5 @@ namespace utp::ui {
 		repack.x = loadXML.x + loadXML.width + padding;
 		repack.y = loadXML.y;
 		repack.draw();
-
-		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (CheckCollisionPointRec(GetMousePosition(), clipRect) || disabled) && canDrag) {
-			camPreview.target -= GetMouseDelta() / camPreview.zoom;
-			Button::globalDisabled = disabled = true;
-		} else {
-			Button::globalDisabled = disabled = false;
-		}
-		GuiEnable();
 	}
 } // namespace utp::ui

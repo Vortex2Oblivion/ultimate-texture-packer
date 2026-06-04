@@ -28,12 +28,19 @@ int main() {
 	auto loadFilesButton = utp::ui::Button(10, 10, 48, 48, "", "Load Files", BLACK);
 	loadFilesButton.icon = ICON_FILE_ADD;
 
-	loadFilesButton.onPress.append([&loadMenu, &loadFilesButton] {
+	auto outputPreview = utp::ui::RenderArea(loadFilesButton.x + loadFilesButton.width, loadFilesButton.y + loadFilesButton.height,
+											 static_cast<float>(GetRenderWidth()) - scroll.width, screenHeight);
+
+	loadFilesButton.onPress.append([&loadMenu, &loadFilesButton, &outputPreview] {
 		loadMenu.open = true;
 		loadFilesButton.disabled = true;
+		outputPreview.canDrag = false;
 	});
 
-	loadMenu.onClose.append([&loadFilesButton] { loadFilesButton.disabled = false; });
+	loadMenu.onClose.append([&loadFilesButton, &outputPreview] {
+		loadFilesButton.disabled = false;
+		outputPreview.canDrag = true;
+	});
 
 	loadMenu.repack.onPress.append([&scroll, &loadMenu] {
 		Image dst;
@@ -57,11 +64,10 @@ int main() {
 
 	Texture bigPreview{};
 
-	scroll.onSelect.append([&scroll, &bigPreview] { bigPreview = scroll.currentTexture; });
+	scroll.onSelect.append([&scroll, &bigPreview] {
+		bigPreview = scroll.currentTexture;
+	});
 
-
-	auto outputPreview = utp::ui::RenderArea(loadFilesButton.x + loadFilesButton.width, loadFilesButton.y + loadFilesButton.height,
-											 static_cast<float>(GetRenderWidth()) - scroll.width, screenHeight);
 
 	outputPreview.onDraw.append([&bigPreview] {
 		if (IsTextureValid(bigPreview)) {

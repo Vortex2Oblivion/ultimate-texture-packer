@@ -3,6 +3,7 @@
 #include <vector>
 
 #include "Button.hpp"
+#include "RenderArea.hpp"
 #include "data/Frame.hpp"
 #include "eventpp/callbacklist.h"
 
@@ -29,6 +30,8 @@ namespace utp::ui {
 		Button loadSpritesheet;
 		Button loadXML;
 		Button repack;
+
+		RenderArea renderArea;
 
 
 		static float padding;
