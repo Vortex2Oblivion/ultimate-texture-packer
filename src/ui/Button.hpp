@@ -12,19 +12,23 @@ namespace utp::ui {
 		~Button();
 		void draw();
 
-		float x;
-		float y;
-		float width;
-		float height;
-		Color color = BLACK;
-		std::string tooltip;
-		std::string text;
-		int icon = -1;
-
 		bool pressed = false;
 		bool disabled = false;
 
+		int icon = -1;
+
+		float x = 0.0f;
+		float y = 0.0f;
+		float width = 0.0f;
+		float height = 0.0f;
+
+		Color color = BLACK;
+		std::string tooltip;
+		std::string text;
+
 		eventpp::CallbackList<void()> onPress;
+
+		static bool globalDisabled;
 
 	private:
 		static bool drawTooltip;

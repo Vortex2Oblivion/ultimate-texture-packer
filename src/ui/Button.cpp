@@ -4,6 +4,7 @@
 
 namespace utp::ui {
 	bool Button::drawTooltip = false;
+	bool Button::globalDisabled = false;
 
 	Button::Button(const float x, const float y, const float width, const float height, const std::string &text,
 				   const std::string &tooltip, const Color color) {
@@ -20,10 +21,10 @@ namespace utp::ui {
 		}
 	}
 
-	Button::~Button() = default;
+	Button::~Button() = default	;
 
 	void Button::draw() {
-		if (disabled) {
+		if (disabled || globalDisabled) {
 			GuiDisable();
 		}
 		const auto hitbox = Rectangle{.x = x, .y = y, .width = width, .height = height};

@@ -167,9 +167,9 @@ namespace utp::ui {
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) && (CheckCollisionPointRec(GetMousePosition(), clipRect) || disabled) && canDrag) {
 			camPreview.target -= GetMouseDelta() / camPreview.zoom;
-			disabled = loadSpritesheet.disabled = loadXML.disabled = repack.disabled = true;
+			Button::globalDisabled = disabled = true;
 		} else {
-			disabled = loadSpritesheet.disabled = loadXML.disabled = repack.disabled = false;
+			Button::globalDisabled = disabled = false;
 		}
 		GuiEnable();
 	}
