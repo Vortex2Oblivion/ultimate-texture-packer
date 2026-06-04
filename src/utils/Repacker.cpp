@@ -1,15 +1,13 @@
 #include "Repacker.hpp"
 
 #include <cmath>
-#include <iostream>
-#include <ostream>
 
+#include "ImageUtil.hpp"
 #include "MaxRectsBinPack.h"
 
 namespace utp::utils {
 	void Repacker::repack(Image &dst, const Image &src, const int width, const int height, const std::vector<data::Frame> &frames,
 						  const bool allowRotate, const bool crop) {
-
 		dst = GenImageColor(width, height, BLANK);
 		auto packer = rbp::MaxRectsBinPack(width, height, allowRotate);
 
@@ -44,9 +42,7 @@ namespace utp::utils {
 
 			srcRect = Rectangle{.x = frame.x, .y = frame.y, .width = frame.width, .height = frame.height};
 
-			imageCropped = ImageCopy(src);
-
-			ImageCrop(&imageCropped, srcRect);
+			imageCropped = ImageUtil::crop(src, srcRect);
 
 			if (wasRotated) {
 				ImageRotateCW(&imageCropped);
