@@ -46,6 +46,13 @@ namespace utp::ui {
 			else {
 				dragging = false;
 			}
+
+			if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+				onMouseDown();
+			}
+			else if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
+				onMouseUp();
+			}
 		}
 
 		onDraw();

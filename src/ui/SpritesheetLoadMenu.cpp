@@ -85,6 +85,14 @@ namespace utp::ui {
 				DrawRectanglePro(rect, Vector2Zero(), 0.0f, ColorAlpha(BLUE, 0.1));
 			}
 		});
+
+		renderArea.onMouseDown.append([this] {
+			disabled = Button::globalDisabled = true;
+		});
+
+		renderArea.onMouseUp.append([this] {
+			disabled = Button::globalDisabled = false;
+		});
 	}
 
 	SpritesheetLoadMenu::~SpritesheetLoadMenu() = default;
