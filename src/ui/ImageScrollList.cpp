@@ -76,7 +76,7 @@ namespace utp::ui {
 		if (heightBigger) {
 			scale = (static_cast<float>(GetRenderHeight()) - height) / static_cast<float>(currentTexture.height);
 		} else {
-			scale = (static_cast<float>(GetRenderHeight()) - width) / static_cast<float>(currentTexture.width);
+			scale = width / static_cast<float>(currentTexture.width);
 		}
 
 		DrawTexturePro(currentTexture,

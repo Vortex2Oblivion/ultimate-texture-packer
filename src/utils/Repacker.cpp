@@ -23,7 +23,7 @@ namespace utp::utils {
 				}
 			}
 			_rect = packer.Insert(static_cast<int>(frame.width), static_cast<int>(frame.height),
-								  rbp::MaxRectsBinPack::RectBestShortSideFit);
+								  rbp::MaxRectsBinPack::RectBottomLeftRule);
 
 			packedRect = Rectangle{.x = static_cast<float>(_rect.x),
 								   .y = static_cast<float>(_rect.y),

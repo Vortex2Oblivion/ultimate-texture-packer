@@ -58,7 +58,7 @@ int main() {
 
 	Rectangle canvas = {.x = loadFilesButton.x + loadFilesButton.width,
 						.y = loadFilesButton.y + loadFilesButton.height,
-						.width = screenWidth,
+						.width = static_cast<float>(GetRenderWidth()) - scroll.width,
 						.height = screenHeight};
 
 	Camera2D camPreview = {.offset = Vector2Zero(), .target = Vector2Zero(), .rotation = 0.0f, .zoom = 1.0f};
