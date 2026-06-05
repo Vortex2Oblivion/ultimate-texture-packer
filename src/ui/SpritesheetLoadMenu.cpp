@@ -34,9 +34,9 @@ namespace utp::ui {
 				TraceLog(LOG_ERROR, NFD_GetError());
 				return;
 			}
-			loadSpritesheet.tooltip = outPath;
+			loadSpritesheet.tooltip = outPath.string();
 			UnloadTexture(selectedSpritesheetPreview);
-			selectedSpritesheetPreview = LoadTexture(outPath.c_str());
+			selectedSpritesheetPreview = LoadTexture(outPath.string().c_str());
 		});
 
 		loadXML.onPress.append([this, x, y] {
@@ -47,7 +47,7 @@ namespace utp::ui {
 				return;
 			}
 
-			loadXML.tooltip = outPath;
+			loadXML.tooltip = outPath.string();
 			rectsToDraw.clear();
 			pugi::xml_document doc;
 			doc.load_file(outPath.c_str());

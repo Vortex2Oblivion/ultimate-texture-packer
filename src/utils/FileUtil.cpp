@@ -10,7 +10,9 @@ namespace utp::utils {
 		const nfdopendialogu8args_t args = {
 				.filterList = filterList.data(),
 				.filterCount = static_cast<nfdfiltersize_t>(filterList.size()),
-				.defaultPath = defaultPath.c_str(),
+				#ifndef _WIN32 // windows just sucks i guess???
+				.defaultPath = defaultPath.string().c_str(),
+				#endif
 		};
 
 
