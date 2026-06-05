@@ -11,7 +11,7 @@ namespace utp::utils {
 				.filterList = filterList.data(),
 				.filterCount = static_cast<nfdfiltersize_t>(filterList.size()),
 				#ifndef _WIN32 // windows just sucks i guess???
-				.defaultPath = defaultPath.string().c_str(),
+				.defaultPath = defaultPath.c_str(),
 				#endif
 		};
 
