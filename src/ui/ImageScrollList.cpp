@@ -13,10 +13,7 @@ namespace utp::ui {
 
 	ImageScrollList::ImageScrollList(const Rectangle bounds) : ImageScrollList(bounds.x, bounds.y, bounds.width, bounds.height) {}
 
-	ImageScrollList::~ImageScrollList() {
-		for (const auto texture: textures) {
-		}
-	};
+	ImageScrollList::~ImageScrollList() = default;
 
 	void ImageScrollList::draw() {
 		framePassed = true;

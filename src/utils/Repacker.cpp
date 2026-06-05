@@ -1,9 +1,8 @@
 #include "Repacker.hpp"
 
-#include <cmath>
-
 #include "ImageUtil.hpp"
 #include "MaxRectsBinPack.h"
+#include <cmath>
 
 namespace utp::utils {
 	void Repacker::repack(Image &dst, const Image &src, const int width, const int height, const std::vector<data::Frame> &frames,
@@ -40,7 +39,7 @@ namespace utp::utils {
 								   .width = static_cast<float>(_rect.width),
 								   .height = static_cast<float>(_rect.height)};
 
-			srcRect = Rectangle{.x = frame.x, .y = frame.y, .width = frame.width, .height = frame.height};
+			srcRect = Rectangle{.x = std::floorf(frame.x), .y = std::floorf(frame.y), .width = std::floorf(frame.width), .height = std::floorf(frame.height)};
 
 			imageCropped = ImageUtil::crop(src, srcRect);
 
@@ -63,7 +62,6 @@ namespace utp::utils {
 			}
 
 			UnloadImage(imageCropped);
-			packedFrames.push_back(frame);
 
 		end:;
 		}
