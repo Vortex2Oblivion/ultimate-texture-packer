@@ -3,6 +3,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <cstring>
+#include <cmath>
 
 namespace utp::utils {
 	Image ImageUtil::crop(const Image &image, Rectangle crop) {
@@ -11,6 +12,10 @@ namespace utp::utils {
 			return image;
 
 		// Security checks to validate crop rectangle
+		crop.x = std::floor(crop.x);
+		crop.y = std::floor(crop.y);
+		crop.width = std::floor(crop.width);
+		crop.height = std::floor(crop.height);
 		if (crop.x < 0) {
 			crop.width += crop.x;
 			crop.x = 0;

@@ -1,6 +1,5 @@
 #include "Repacker.hpp"
 
-#include <cmath>
 #include "ImageUtil.hpp"
 #include "MaxRectsBinPack.h"
 #include "raymath.h"
@@ -42,12 +41,7 @@ namespace utp::utils {
 								   .width = static_cast<float>(_rect.width),
 								   .height = static_cast<float>(_rect.height)};
 
-			srcRect = Rectangle{.x = std::floor(frame.x),
-								.y = std::floor(frame.y),
-								.width = std::floor(frame.width),
-								.height = std::floor(frame.height)};
-
-			imageCropped = ImageUtil::crop(src, srcRect);
+			imageCropped = ImageUtil::crop(src, frame);
 
 			if (wasRotated) {
 				ImageRotateCW(&imageCropped);

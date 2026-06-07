@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "raylib.h"
 
 namespace utp::data {
 	struct Frame {
@@ -18,5 +19,7 @@ namespace utp::data {
 		bool operator==(const Frame &frame) const {
 			return frame.x == this->x && frame.y == this->y && frame.width == this->width && frame.height == this->height;
 		}
+
+		operator Rectangle() const { return Rectangle{.x = x, .y = y, .width = width, .height = height}; }
 	};
 } // namespace utp::data
