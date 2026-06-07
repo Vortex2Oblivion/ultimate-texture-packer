@@ -32,14 +32,14 @@ namespace utp::utils {
 			_rect = packer.Insert(static_cast<int>(frame.width), static_cast<int>(frame.height),
 								  rbp::MaxRectsBinPack::RectBottomLeftRule);
 
-			wasRotated = static_cast<float>(_rect.width) == frame.height && static_cast<float>(_rect.height) == frame.width;
+			wasRotated = static_cast<float>(_rect.width) == frame.height && static_cast<float>(_rect.height) == frame.width && allowRotate;
 
 			packedRect = Rectangle{.x = static_cast<float>(_rect.x),
 								   .y = static_cast<float>(_rect.y),
 								   .width = static_cast<float>(_rect.width),
 								   .height = static_cast<float>(_rect.height)};
 
-			srcRect = Rectangle{.x = std::floorf(frame.x), .y = std::floorf(frame.y), .width = std::floorf(frame.width), .height = std::floorf(frame.height)};
+			srcRect = Rectangle{.x = std::floor(frame.x), .y = std::floor(frame.y), .width = std::floor(frame.width), .height = std::floor(frame.height)};
 
 			imageCropped = ImageUtil::crop(src, srcRect);
 
