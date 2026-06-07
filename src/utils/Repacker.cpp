@@ -3,6 +3,7 @@
 #include <cmath>
 #include "ImageUtil.hpp"
 #include "MaxRectsBinPack.h"
+#include "raymath.h"
 
 namespace utp::utils {
 	std::vector<data::Frame> Repacker::repack(Image &dst, const Image &src, const int width, const int height,
@@ -54,13 +55,13 @@ namespace utp::utils {
 
 			if (packedRect.width != 0 && packedRect.height != 0) {
 
-				ImageDraw(&dst, imageCropped,
-						  Rectangle{.x = 0.0f,
-									.y = 0.0f,
-									.width = static_cast<float>(imageCropped.width),
-									.height = static_cast<float>(imageCropped.height)},
+				ImageDrawImagePro(&dst, imageCropped,
+								  Rectangle{.x = 0.0f,
+											.y = 0.0f,
+											.width = static_cast<float>(imageCropped.width),
+											.height = static_cast<float>(imageCropped.height)},
 						  Rectangle{.x = packedRect.x, .y = packedRect.y, .width = packedRect.width, .height = packedRect.height},
-						  WHITE);
+						  Vector2Zero(), 0.0f, WHITE);
 
 				packedFrames.push_back(frame);
 				croppedWidth = std::max(croppedWidth, packedRect.x + packedRect.width);
