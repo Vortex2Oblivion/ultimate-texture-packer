@@ -7,7 +7,9 @@
 #include "ui/RenderArea.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
 #include "utils/FileUtil.hpp"
+#include "utils/Memory.hpp"
 #include "utils/Repacker.hpp"
+#include "utils/StringUtil.hpp"
 
 #if !defined(NDEBUG) || defined(_DEBUG)
 #define DEBUG
@@ -57,7 +59,7 @@ int main() {
 		Image dst;
 		const Image src = LoadImageFromTexture(loadMenu.selectedSpritesheetPreview);
 
-		packedFrames = utp::utils::Repacker::repack(dst, src, 8192, 8192, loadMenu.frames, true);
+		packedFrames = utp::utils::Repacker::repack(dst, src, 8192, 8192, loadMenu.frames, false);
 
 		Texture t = LoadTextureFromImage(dst);
 #ifdef false
@@ -81,9 +83,15 @@ int main() {
 	});
 
 
-	outputPreview.onDraw.append([&bigPreview] {
+	outputPreview.onDraw.append([&bigPreview, &packedFrames] {
 		if (IsTextureValid(bigPreview)) {
 			DrawTexture(bigPreview, 0, 0, WHITE);
+			for (auto &frame: packedFrames) {
+				DrawRectangleRec(static_cast<Rectangle>(frame), ColorAlpha(BLUE, 0.1));
+#ifdef false
+				DrawLine(frame.x, frame.y + frame.height, frame.x + frame.width, frame.y, RED);
+#endif
+			}
 		}
 	});
 
@@ -99,6 +107,7 @@ int main() {
 
 		pugi::xml_node textureAtlas = doc.append_child("TextureAtlas");
 		textureAtlas.append_attribute("imagePath") = "";
+
 		for (const auto &[x, y, width, height, frameX, frameY, frameWidth, frameHeight, rotated, name]: packedFrames) {
 			pugi::xml_node subTexture = doc.child("TextureAtlas").append_child("SubTexture");
 			subTexture.append_attribute("name") = name;
@@ -114,7 +123,9 @@ int main() {
 		}
 
 
-		doc.save_file("output.xml");
+		if (!doc.save_file("output.xml")) {
+			TraceLog(LOG_ERROR, "Failed to save output.xml");
+		}
 		const auto img = LoadImageFromTexture(bigPreview);
 		auto t = std::thread([img] {
 			ExportImage(img, "output.png");
@@ -138,6 +149,7 @@ int main() {
 
 #ifdef DEBUG
 		DrawFPS(0, 0);
+		DrawText(utp::utils::StringUtil::formatBytes(utp::utils::Memory::getCurrentRSS()).c_str(), 0, 20, 20, LIME);
 #endif
 		EndDrawing();
 	}

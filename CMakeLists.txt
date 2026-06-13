@@ -15,7 +15,11 @@ add_executable(ultimate_texture_packer src/Main.cpp
         src/ui/RenderArea.cpp
         src/ui/RenderArea.hpp
         src/utils/ImageUtil.cpp
-        src/utils/ImageUtil.hpp)
+        src/utils/ImageUtil.hpp
+        src/utils/Memory.cpp
+        src/utils/Memory.hpp
+        src/utils/StringUtil.cpp
+        src/utils/StringUtil.hpp)
 
 include_directories(src/)
 

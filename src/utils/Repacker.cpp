@@ -16,13 +16,13 @@ namespace utp::utils {
 		float croppedWidth = 0.0f;
 		float croppedHeight = 0.0f;
 
+		// TODO: rewrite this to properly pack duplicated frames
 		for (const auto &frame: frames) {
 			Rectangle packedRect{};
 			rbp::Rect _rect{};
 
 			bool wasRotated;
 
-			Rectangle srcRect{};
 			Image imageCropped{};
 
 			for (const auto &packed: packedFrames) {
@@ -41,7 +41,7 @@ namespace utp::utils {
 								   .width = static_cast<float>(_rect.width),
 								   .height = static_cast<float>(_rect.height)};
 
-			imageCropped = ImageUtil::crop(src, frame);
+			imageCropped = ImageUtil::crop(src, static_cast<Rectangle>(frame));
 
 			if (wasRotated) {
 				ImageRotateCW(&imageCropped);

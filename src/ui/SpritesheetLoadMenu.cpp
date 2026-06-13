@@ -82,7 +82,7 @@ namespace utp::ui {
 			DrawTexture(selectedSpritesheetPreview, static_cast<int>(x), static_cast<int>(y), WHITE);
 
 			for (const auto rect: rectsToDraw) {
-				DrawRectanglePro(rect, Vector2Zero(), 0.0f, ColorAlpha(BLUE, 0.1));
+				DrawRectangleRec(rect, ColorAlpha(BLUE, 0.1));
 			}
 		});
 
