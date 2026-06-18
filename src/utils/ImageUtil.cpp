@@ -1,9 +1,8 @@
 #include "ImageUtil.hpp"
 
-#include <cstddef>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
-#include <cmath>
 
 namespace utp::utils {
 	Image ImageUtil::crop(const Image &image, Rectangle crop) {
@@ -52,5 +51,12 @@ namespace utp::utils {
 			return Image{.data = croppedData, .width = static_cast<int>(crop.width), .height = static_cast<int>(crop.height), .mipmaps = image.mipmaps, .format = image.format};
 		}
 		return image;
+	}
+
+	bool ImageUtil::equals(const Image &a, const Image &b) {
+		if (a.width * a.height != b.width * b.height || a.format != b.format) {
+			return false;
+		}
+		return memcmp(a.data, b.data, GetPixelDataSize(a.width, a.height, a.format)) == 0;
 	}
 } // namespace utp::utils

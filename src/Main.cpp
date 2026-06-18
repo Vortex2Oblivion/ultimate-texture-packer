@@ -3,6 +3,7 @@
 #include <iostream>
 #include "pugixml.hpp"
 #include "raygui.h"
+#include "raymath.h"
 #include "ui/ImageScrollList.hpp"
 #include "ui/RenderArea.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"

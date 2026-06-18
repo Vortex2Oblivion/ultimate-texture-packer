@@ -1,5 +1,7 @@
 #include "Repacker.hpp"
 
+#include <iostream>
+
 #include "ImageUtil.hpp"
 #include "MaxRectsBinPack.h"
 #include "raymath.h"
@@ -8,77 +10,95 @@ namespace utp::utils {
 	std::vector<data::Frame> Repacker::repack(Image &dst, const Image &src, const int width, const int height,
 											  const std::vector<data::Frame> &frames, const bool allowRotate, const bool crop) {
 		dst = GenImageColor(width, height, BLANK);
-		auto packer = rbp::MaxRectsBinPack(width, height, allowRotate);
+		auto packer = rbp::MaxRectsBinPack(width, height,
+#ifdef false
+										   allowRotate
+#else
+										   false
+#endif
+		);
 
 		std::vector<data::Frame> packedFrames = {};
 		std::vector<data::Frame> outputFrames = {};
 
-		float croppedWidth = 0.0f;
-		float croppedHeight = 0.0f;
+		std::vector<Image> rawFrames = {};
 
-		// TODO: rewrite this to properly pack duplicated frames
+		int croppedWidth = 0;
+		int croppedHeight = 0;
+
+		size_t i = 0;
+
 		for (const auto &frame: frames) {
-			Rectangle packedRect{};
-			rbp::Rect _rect{};
+			bool wasPacked = false;
 
-			bool wasRotated;
-
-			Image imageCropped{};
-
-			for (const auto &packed: packedFrames) {
-				if (frame == packed) {
-					goto end;
+			Image newFrameImage = ImageUtil::crop(src, static_cast<Rectangle>(frame));
+			for (const auto rawFrame: rawFrames) {
+				if (ImageUtil::equals(rawFrame, newFrameImage)) {
+					wasPacked = true;
+					break;
 				}
 			}
-			_rect = packer.Insert(static_cast<int>(frame.width), static_cast<int>(frame.height),
-								  rbp::MaxRectsBinPack::RectBottomLeftRule);
 
-			wasRotated =
-					static_cast<float>(_rect.width) == frame.height && static_cast<float>(_rect.height) == frame.width && allowRotate;
+			rbp::Rect repackedRect = wasPacked ? static_cast<rbp::Rect>(packedFrames[i - 1])
+											   : packer.Insert(static_cast<int>(frame.width), static_cast<int>(frame.height),
+															   rbp::MaxRectsBinPack::RectBottomLeftRule);
 
-			packedRect = Rectangle{.x = static_cast<float>(_rect.x),
-								   .y = static_cast<float>(_rect.y),
-								   .width = static_cast<float>(_rect.width),
-								   .height = static_cast<float>(_rect.height)};
+			// data::Frame packedFrameData = frame;
 
-			imageCropped = ImageUtil::crop(src, static_cast<Rectangle>(frame));
-
-			if (wasRotated) {
-				ImageRotateCW(&imageCropped);
+			auto newFrameData = data::Frame{.x = static_cast<float>(repackedRect.x),
+											.y = static_cast<float>(repackedRect.y),
+											.width = static_cast<float>(repackedRect.width),
+											.height = static_cast<float>(repackedRect.height),
+											.frameX = frame.frameX,
+											.frameY = frame.frameY,
+											.frameWidth = frame.frameWidth,
+											.frameHeight = frame.frameHeight,
+											.rotated = false,
+											.name = frame.name};
+			if (!wasPacked) {
+				//std::cout << newFrameData.x << std::endl;
 			}
 
-			if (packedRect.width != 0 && packedRect.height != 0) {
-
-				ImageDrawImagePro(&dst, imageCropped,
+			if (!wasPacked) {
+				ImageDrawImagePro(&dst, newFrameImage,
 								  Rectangle{.x = 0.0f,
 											.y = 0.0f,
-											.width = static_cast<float>(imageCropped.width),
-											.height = static_cast<float>(imageCropped.height)},
-						  Rectangle{.x = packedRect.x, .y = packedRect.y, .width = packedRect.width, .height = packedRect.height},
-						  Vector2Zero(), 0.0f, WHITE);
-
-				packedFrames.push_back(frame);
-				croppedWidth = std::max(croppedWidth, packedRect.x + packedRect.width);
-				croppedHeight = std::max(croppedHeight, packedRect.y + packedRect.height);
+											.width = static_cast<float>(newFrameImage.width),
+											.height = static_cast<float>(newFrameImage.height)},
+								  Rectangle{.x = static_cast<float>(repackedRect.x),
+											.y = static_cast<float>(repackedRect.y),
+											.width = static_cast<float>(repackedRect.width),
+											.height = static_cast<float>(repackedRect.height)},
+								  Vector2Zero(), 0.0f, WHITE);
+				packedFrames.push_back(newFrameData);
+				i++;
+				croppedWidth = std::max(croppedWidth, repackedRect.x + repackedRect.width);
+				croppedHeight = std::max(croppedHeight, repackedRect.y + repackedRect.height);
 			}
 
-			UnloadImage(imageCropped);
 
-			outputFrames.push_back(data::Frame{.x = packedRect.x,
-											   .y = packedRect.y,
-											   .width = packedRect.width,
-											   .height = packedRect.height,
+			rawFrames.push_back(newFrameImage);
+			outputFrames.push_back(data::Frame{.x = static_cast<float>(repackedRect.x),
+											   .y = static_cast<float>(repackedRect.y),
+											   .width = static_cast<float>(repackedRect.width),
+											   .height = static_cast<float>(repackedRect.height),
 											   .frameX = frame.frameX,
 											   .frameY = frame.frameY,
 											   .frameWidth = frame.frameWidth,
 											   .frameHeight = frame.frameHeight,
-											   .rotated = wasRotated,
+											   .rotated = false,
 											   .name = frame.name});
-		end:;
+		}
+
+		for (const auto frame: rawFrames) {
+			UnloadImage(frame);
 		}
 
 		if (crop) {
-			ImageCrop(&dst, Rectangle{.x = 0.0f, .y = 0.0f, .width = croppedWidth, .height = croppedHeight});
+			ImageCrop(&dst, Rectangle{.x = 0.0f,
+									  .y = 0.0f,
+									  .width = static_cast<float>(croppedWidth),
+									  .height = static_cast<float>(croppedHeight)});
 		}
 
 		return outputFrames;
