@@ -32,6 +32,10 @@ namespace utp::utils {
 			bool wasPacked = false;
 
 			Image newFrameImage = ImageUtil::crop(src, static_cast<Rectangle>(frame));
+
+			/*const float lastWidth = frame.width;
+			const float lastHeight = frame.height;*/
+
 			for (const auto rawFrame: rawFrames) {
 				if (ImageUtil::equals(rawFrame, newFrameImage)) {
 					wasPacked = true;
@@ -41,7 +45,9 @@ namespace utp::utils {
 
 			rbp::Rect repackedRect = wasPacked ? static_cast<rbp::Rect>(packedFrames[i - 1])
 											   : packer.Insert(static_cast<int>(frame.width), static_cast<int>(frame.height),
-															   rbp::MaxRectsBinPack::RectBottomLeftRule);
+															   rbp::MaxRectsBinPack::RectBestAreaFit);
+
+			//std::cout << frame.name << ": " << frame.width << std::endl;
 
 			// data::Frame packedFrameData = frame;
 
@@ -55,8 +61,21 @@ namespace utp::utils {
 											.frameHeight = frame.frameHeight,
 											.rotated = false,
 											.name = frame.name};
+
+			// frame.frameX -= std::abs(lastWidth - newFrameData.width);
+			// frame.frameY -= lastHeight - newFrameData.height;
+
+			bool trimmed = frame.width < frame.frameWidth || frame.height < frame.frameHeight;
+
+			//newFrameData.frameWidth = std::max(newFrameData.frameWidth, newFrameData.width - newFrameData.frameX);
+			//newFrameData.frameHeight = std::max(newFrameData.frameHeight, newFrameData.height - newFrameData.frameY);
+
+			// TODO: fix frame x offsets
+			//newFrameData.frameX += (newFrameData.width - frame.width);
+			newFrameData.frameY += newFrameData.height - frame.height;
+
 			if (!wasPacked) {
-				//std::cout << newFrameData.x << std::endl;
+				// std::cout << newFrameData.x << std::endl;
 			}
 
 			if (!wasPacked) {
@@ -70,24 +89,18 @@ namespace utp::utils {
 											.width = static_cast<float>(repackedRect.width),
 											.height = static_cast<float>(repackedRect.height)},
 								  Vector2Zero(), 0.0f, WHITE);
+
 				packedFrames.push_back(newFrameData);
-				i++;
+
 				croppedWidth = std::max(croppedWidth, repackedRect.x + repackedRect.width);
 				croppedHeight = std::max(croppedHeight, repackedRect.y + repackedRect.height);
+
+				i++;
 			}
 
 
 			rawFrames.push_back(newFrameImage);
-			outputFrames.push_back(data::Frame{.x = static_cast<float>(repackedRect.x),
-											   .y = static_cast<float>(repackedRect.y),
-											   .width = static_cast<float>(repackedRect.width),
-											   .height = static_cast<float>(repackedRect.height),
-											   .frameX = frame.frameX,
-											   .frameY = frame.frameY,
-											   .frameWidth = frame.frameWidth,
-											   .frameHeight = frame.frameHeight,
-											   .rotated = false,
-											   .name = frame.name});
+			outputFrames.push_back(newFrameData);
 		}
 
 		for (const auto frame: rawFrames) {

@@ -120,7 +120,7 @@ int main() {
 			subTexture.append_attribute("frameY") = frameY;
 			subTexture.append_attribute("frameWidth") = frameWidth;
 			subTexture.append_attribute("frameHeight") = frameHeight;
-			subTexture.append_attribute("rotated") = rotated;
+			//subTexture.append_attribute("rotated") = rotated;
 		}
 
 
