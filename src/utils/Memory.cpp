@@ -2,8 +2,8 @@
 
 namespace utp::utils {
 #if defined(_WIN32)
-#include <psapi.h>
 #include <windows.h>
+#include <Psapi.h>
 
 #elif defined(__unix__) || defined(__unix) || defined(unix) || (defined(__APPLE__) && defined(__MACH__))
 #include <sys/resource.h>

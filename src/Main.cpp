@@ -1,9 +1,9 @@
 #include "raylib.h"
 #define RAYGUI_IMPLEMENTATION
-#include <iostream>
+#include "imgui.h"
 #include "pugixml.hpp"
 #include "raygui.h"
-#include "raymath.h"
+#include "rlImGui.h"
 #include "ui/ImageScrollList.hpp"
 #include "ui/RenderArea.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
@@ -11,6 +11,7 @@
 #include "utils/Memory.hpp"
 #include "utils/Repacker.hpp"
 #include "utils/StringUtil.hpp"
+#include "utils/WindowsUtil.hpp"
 
 #if !defined(NDEBUG) || defined(_DEBUG)
 #define DEBUG
@@ -22,9 +23,21 @@ int main() {
 
 	InitWindow(screenWidth, screenHeight, "Ultimate Texture Packer");
 
-	NFD_Init();
+	bool dark =
+#ifdef _WIN32
+			!utp::utils::WindowsUtil::isLightTheme();
+#else
+			true;
+#endif
+
+	if(dark){
+		utp::utils::WindowsUtil::setDarkHeader();
+	}
 
 	SetTargetFPS(GetMonitorRefreshRate(GetCurrentMonitor()));
+	rlImGuiSetup(dark);
+	NFD_Init();
+
 
 	std::vector<utp::data::Frame> packedFrames = {};
 
@@ -120,7 +133,7 @@ int main() {
 			subTexture.append_attribute("frameY") = frameY;
 			subTexture.append_attribute("frameWidth") = frameWidth;
 			subTexture.append_attribute("frameHeight") = frameHeight;
-			//subTexture.append_attribute("rotated") = rotated;
+			subTexture.append_attribute("rotated") = rotated;
 		}
 
 
@@ -139,6 +152,7 @@ int main() {
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(WHITE);
+		rlImGuiBegin();
 
 		outputPreview.draw();
 
@@ -152,9 +166,12 @@ int main() {
 		DrawFPS(0, 0);
 		DrawText(utp::utils::StringUtil::formatBytes(utp::utils::Memory::getCurrentRSS()).c_str(), 0, 20, 20, LIME);
 #endif
+
+		rlImGuiEnd();
 		EndDrawing();
 	}
 
+	rlImGuiShutdown();
 	CloseWindow();
 	NFD_Quit();
 
