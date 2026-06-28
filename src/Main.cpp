@@ -7,8 +7,8 @@
 #include "ui/ImageScrollList.hpp"
 #include "ui/RenderArea.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
+#include "ui/UIMainMenuBar.hpp"
 #include "ui/UIMenu.hpp"
-#include "ui/UIMenuBar.hpp"
 #include "ui/UIMenuItem.hpp"
 #include "ui/UIObject.hpp"
 #include "utils/FileUtil.hpp"
@@ -145,46 +145,32 @@ int main() {
 	});
 
 
-	auto windowBase = std::make_shared<utp::ui::UIObject>(ImVec2(), " ",
-														  ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar |
-																  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
-																  ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar);
-
-	auto windowMenuBar = std::make_shared<utp::ui::UIMenuBar>(ImVec2());
-	windowBase->children.push_back(windowMenuBar);
+	auto mainMenuBar = std::make_shared<utp::ui::UIMainMenuBar>();
 
 	auto fileMenu = std::make_shared<utp::ui::UIMenu>("File");
-	windowMenuBar->children.push_back(fileMenu);
-
+	mainMenuBar->children.push_back(fileMenu);
 	auto editMenu = std::make_shared<utp::ui::UIMenu>("Edit");
-	windowMenuBar->children.push_back(editMenu);
+	mainMenuBar->children.push_back(editMenu);
 
-	auto openButton = std::make_shared<utp::ui::UIMenuItem>("Open");
-	fileMenu->children.push_back(openButton);
-	openButton->onPress.append([&loadMenu, &loadFilesButton, &outputPreview] {
-		loadMenu.open = true;
-		loadFilesButton.disabled = true;
-		outputPreview.canDrag = false;
-	});
+	auto viewMenu = std::make_shared<utp::ui::UIMenu>("View");
+	mainMenuBar->children.push_back(viewMenu);
+
+	auto windowMenu = std::make_shared<utp::ui::UIMenu>("Window");
+	mainMenuBar->children.push_back(windowMenu);
+
+	auto helpMenu = std::make_shared<utp::ui::UIMenu>("Help");
+	mainMenuBar->children.push_back(helpMenu);
 
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(WHITE);
 		rlImGuiBegin();
 
-		windowBase->update(GetFrameTime());
-		windowBase->draw();
-
-		outputPreview.draw();
-
-		//loadFilesButton.draw();
-		//exportButton.draw();
-
-		//scroll.draw();
-		//loadMenu.draw();
+		mainMenuBar->update(GetFrameTime());
+		mainMenuBar->draw();
 
 #ifdef DEBUG
-		ImGui::Begin("Application Resources");
+		ImGui::Begin("Application Information");
 		ImGui::Text("Application average %.3f ms/frame (%.1i FPS)", 1000.0 / GetFPS(), GetFPS());
 		ImGui::Text("Application memory usage %s / %s",
 					utp::utils::StringUtil::formatBytes(utp::utils::Memory::getCurrentRSS()).c_str(),

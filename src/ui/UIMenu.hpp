@@ -1,5 +1,5 @@
-
 #pragma once
+
 #include "UIObject.hpp"
 
 namespace utp::ui {
@@ -8,8 +8,6 @@ namespace utp::ui {
 		explicit UIMenu(const std::string &name);
 		bool enabled = true;
 
-	protected:
-		bool begin() override;
-		void end() override;
+		UTP_BEGIN_END
 	};
 } // namespace utp::ui

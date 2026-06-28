@@ -5,6 +5,14 @@
 
 #include "imgui.h"
 
+#ifndef UTP_BEGIN_END
+#define UTP_BEGIN_END \
+protected: \
+	bool begin() override; \
+	void end() override; \
+
+#endif
+
 namespace utp::ui {
 	class UIObject {
 	public:
