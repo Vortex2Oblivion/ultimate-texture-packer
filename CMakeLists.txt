@@ -3,20 +3,19 @@ project(ultimate_texture_packer)
 
 set(CMAKE_CXX_STANDARD 20)
 
-file(GLOB_RECURSE SRC "src/*.cpp")
+file(GLOB_RECURSE SRC src/*.cpp)
 
-set(IMGUI_DIR "external/imgui")
+set(IMGUI_DIR external/imgui)
 set(IMGUI
-    ${IMGUI_DIR}/imgui.cpp
-    ${IMGUI_DIR}/imgui_draw.cpp
-    ${IMGUI_DIR}/imgui_tables.cpp
-    ${IMGUI_DIR}/imgui_widgets.cpp
+        ${IMGUI_DIR}/imgui.cpp
+        ${IMGUI_DIR}/imgui_draw.cpp
+        ${IMGUI_DIR}/imgui_demo.cpp
+        ${IMGUI_DIR}/imgui_tables.cpp
+        ${IMGUI_DIR}/imgui_widgets.cpp
 )
 
-set(RL_IMGUI_DIR "external/rlImGui")
-set(RL_IMGUI
-    ${RL_IMGUI_DIR}/rlImGui.cpp
-)
+set(RL_IMGUI_DIR external/rlImGui)
+set(RL_IMGUI ${RL_IMGUI_DIR}/rlImGui.cpp)
 
 add_executable(ultimate_texture_packer ${SRC} ${IMGUI} ${RL_IMGUI})
 
@@ -24,9 +23,9 @@ include_directories(src/)
 include_directories(external/rlImGui)
 include_directories(external/imgui/)
 
-if(WIN32)
-target_link_libraries(${PROJECT_NAME} dwmapi)
-endif()
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} dwmapi)
+endif ()
 
 add_subdirectory(external/raylib)
 target_link_libraries(${PROJECT_NAME} raylib)

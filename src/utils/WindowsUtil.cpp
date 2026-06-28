@@ -30,6 +30,8 @@ namespace utp::utils {
 		auto i = int(buffer[3] << 24 | buffer[2] << 16 | buffer[1] << 8 | buffer[0]);
 
 		return i == 1;
+#else
+		return false;
 #endif
 	}
 

@@ -7,6 +7,10 @@
 #include "ui/ImageScrollList.hpp"
 #include "ui/RenderArea.hpp"
 #include "ui/SpritesheetLoadMenu.hpp"
+#include "ui/UIMenu.hpp"
+#include "ui/UIMenuBar.hpp"
+#include "ui/UIMenuItem.hpp"
+#include "ui/UIObject.hpp"
 #include "utils/FileUtil.hpp"
 #include "utils/Memory.hpp"
 #include "utils/Repacker.hpp"
@@ -23,14 +27,9 @@ int main() {
 
 	InitWindow(screenWidth, screenHeight, "Ultimate Texture Packer");
 
-	bool dark =
-#ifdef _WIN32
-			!utp::utils::WindowsUtil::isLightTheme();
-#else
-			true;
-#endif
+	bool dark = !utp::utils::WindowsUtil::isLightTheme();
 
-	if(dark){
+	if (dark) {
 		utp::utils::WindowsUtil::setDarkHeader();
 	}
 
@@ -58,11 +57,6 @@ int main() {
 	auto outputPreview = utp::ui::RenderArea(loadFilesButton.x + loadFilesButton.width, loadFilesButton.y + loadFilesButton.height,
 											 static_cast<float>(GetRenderWidth()) - scroll.width, screenHeight);
 
-	loadFilesButton.onPress.append([&loadMenu, &loadFilesButton, &outputPreview] {
-		loadMenu.open = true;
-		loadFilesButton.disabled = true;
-		outputPreview.canDrag = false;
-	});
 
 	loadMenu.onClose.append([&loadFilesButton, &outputPreview] {
 		loadFilesButton.disabled = false;
@@ -140,31 +134,65 @@ int main() {
 		if (!doc.save_file("output.xml")) {
 			TraceLog(LOG_ERROR, "Failed to save output.xml");
 		}
+
 		const auto img = LoadImageFromTexture(bigPreview);
 		auto t = std::thread([img] {
 			ExportImage(img, "output.png");
 			UnloadImage(img);
 		});
+
 		t.detach();
 	});
 
+
+	auto windowBase = std::make_shared<utp::ui::UIObject>(ImVec2(), " ",
+														  ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoTitleBar |
+																  ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoResize |
+																  ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar);
+
+	auto windowMenuBar = std::make_shared<utp::ui::UIMenuBar>(ImVec2());
+	windowBase->children.push_back(windowMenuBar);
+
+	auto fileMenu = std::make_shared<utp::ui::UIMenu>("File");
+	windowMenuBar->children.push_back(fileMenu);
+
+	auto editMenu = std::make_shared<utp::ui::UIMenu>("Edit");
+	windowMenuBar->children.push_back(editMenu);
+
+	auto openButton = std::make_shared<utp::ui::UIMenuItem>("Open");
+	fileMenu->children.push_back(openButton);
+	openButton->onPress.append([&loadMenu, &loadFilesButton, &outputPreview] {
+		loadMenu.open = true;
+		loadFilesButton.disabled = true;
+		outputPreview.canDrag = false;
+	});
 
 	while (!WindowShouldClose()) {
 		BeginDrawing();
 		ClearBackground(WHITE);
 		rlImGuiBegin();
 
+		windowBase->update(GetFrameTime());
+		windowBase->draw();
+
 		outputPreview.draw();
 
-		loadFilesButton.draw();
-		exportButton.draw();
+		//loadFilesButton.draw();
+		//exportButton.draw();
 
-		scroll.draw();
-		loadMenu.draw();
+		//scroll.draw();
+		//loadMenu.draw();
 
 #ifdef DEBUG
-		DrawFPS(0, 0);
-		DrawText(utp::utils::StringUtil::formatBytes(utp::utils::Memory::getCurrentRSS()).c_str(), 0, 20, 20, LIME);
+		ImGui::Begin("Application Resources");
+		ImGui::Text("Application average %.3f ms/frame (%.1i FPS)", 1000.0 / GetFPS(), GetFPS());
+		ImGui::Text("Application memory usage %s / %s",
+					utp::utils::StringUtil::formatBytes(utp::utils::Memory::getCurrentRSS()).c_str(),
+					utp::utils::StringUtil::formatBytes(utp::utils::Memory::getPeakRSS()).c_str());
+		ImGui::End();
+
+		ImGui::ShowDebugLogWindow();
+
 #endif
 
 		rlImGuiEnd();
